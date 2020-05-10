@@ -7,6 +7,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Aquarium
 {
@@ -33,9 +34,8 @@ public class Aquarium
         size = columnTotals.length;
 
         aquariums = new int[size][];
-        for (int i = 3; i < lines.size(); i++) {
-            aquariums[i - 3] = parseLine(lines.get(i));
-        }
+        for (int i = 0; i < size; i++)
+            aquariums[i] = parseLine(lines.get(i + 3));
 
         spaces = new Space[size][size];
         clear();
@@ -58,9 +58,8 @@ public class Aquarium
     {
         String tokens[] = s.split(" ");
         int result[] = new int[tokens.length];
-        for (int i = 0; i < tokens.length; i++) {
+        for (int i = 0; i < tokens.length; i++)
             result[i] = Integer.parseInt(tokens[i]);
-        }
 
         return result;
     }
@@ -113,11 +112,7 @@ public class Aquarium
         if (r < 0 || r >= size) return;
         if (c < 0 || c >= size) return;
 
-        if (spaces[r][c] == targetState) {
-            spaces[r][c] = Space.EMPTY;
-        } else {
-            spaces[r][c] = targetState;
-        }
+        spaces[r][c] = (spaces[r][c] == targetState) ? Space.EMPTY : targetState;
     }
 
     /**
@@ -144,9 +139,7 @@ public class Aquarium
     public void clear()
     {
         for (int r = 0; r < size; r++) {
-            for (int c = 0; c < size; c++) {
-                spaces[r][c] = Space.EMPTY;
-            }
+            Arrays.fill(spaces[r], Space.EMPTY);
         }
     }
 }
