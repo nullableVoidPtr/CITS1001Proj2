@@ -1,11 +1,12 @@
+
 /**
  * Aquarium represents a single problem in the game Aquarium.
  *
  * @author Lyndon While
- * @author Aria Warddhana
+ * @author Jesse Francis (21829656)
+ * @author Aria Warddhana (22984998)
  * @version 2020
  */
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
