@@ -191,7 +191,8 @@ public class CheckSolutionTest
         ax.rightClick(1,3);
         ax.leftClick(1,2);
         s = CheckSolution.isSolution(ax);
-        assertTrue("Columns 0,1 wrong", s.equals("Column 0 is wrong") || s.equals("Column 1 is wrong"));
+        assertTrue("Columns 0,1 wrong", s.equals("Column 0 is wrong") || s.equals("Column 1 is wrong")
+                                     || s.equals("Column 2 is wrong") || s.equals("Column 3 is wrong"));
         // fix Columns 0 & 1
         ax.leftClick(1,0);
         ax.rightClick(1,1);

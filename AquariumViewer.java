@@ -20,7 +20,13 @@ public class AquariumViewer implements MouseListener
     private Aquarium puzzle; // the internal representation of the puzzle
     private int        size; // the puzzle is size x size
     private SimpleCanvas sc; // the display window
-
+    
+    private final Color waterClr    = Color.blue;
+    private final Color airClr   = Color.green;
+    private final Color gridLine = Color.black;
+    private final Color aqumLine = Color.red;
+    private final Color textClr  = Color.black;
+    private final Color bgColor  = Color.white;
     /**
      * Main constructor for objects of class AquariumViewer.
      * Sets all fields, and displays the initial puzzle.
@@ -28,6 +34,16 @@ public class AquariumViewer implements MouseListener
     public AquariumViewer(Aquarium puzzle)
     {
         // TODO 8
+        this.puzzle = puzzle;
+        size = puzzle.getSize();
+        this.WINDOWSIZE = size * BOXSIZE + 2 * OFFSET;
+        sc = new SimpleCanvas(size + " x " + size + " Aquarium Puzzle", WINDOWSIZE, WINDOWSIZE, bgColor);
+        sc.addMouseListener(this);
+        sc.setFont(new Font("Times", 20, BOXSIZE / 2));
+        displayPuzzle();
+        //displayGrid();
+        //displayAquariums();
+        //displayButtons();    
     }
     
     /**
@@ -53,7 +69,7 @@ public class AquariumViewer implements MouseListener
     public Aquarium getPuzzle()
     {
         // TODO 7a
-        return null;
+        return puzzle;
     }
     
     /**
@@ -62,7 +78,7 @@ public class AquariumViewer implements MouseListener
     public int getSize()
     {
         // TODO 7b
-        return -1;
+        return size;
     }
 
     /**
@@ -71,7 +87,7 @@ public class AquariumViewer implements MouseListener
     public SimpleCanvas getCanvas()
     {
         // TODO 7c
-        return null;
+        return sc;
     }
     
     /**
@@ -88,6 +104,11 @@ public class AquariumViewer implements MouseListener
     public void displayGrid()
     {
         // TODO 9
+        for (int i = 0 ; i <= size; i++)
+            {
+            sc.drawLine(OFFSET, OFFSET + i * BOXSIZE, OFFSET + size * BOXSIZE, OFFSET + i * BOXSIZE, gridLine);
+            sc.drawLine(OFFSET + i * BOXSIZE, OFFSET, OFFSET + i * BOXSIZE, OFFSET + size * BOXSIZE, gridLine);
+            }
     }
     
     /**
@@ -96,6 +117,11 @@ public class AquariumViewer implements MouseListener
     public void displayNumbers()
     {
         // TODO 10
+        for (int i = 1 ; i <= size; i++)
+            {
+            sc.drawString(puzzle.getColumnTotals()[i-1], OFFSET / 2 + i * BOXSIZE + BOXSIZE / 2, OFFSET * 3/4, textClr);
+            sc.drawString(puzzle.getRowTotals()[i-1], OFFSET * 3 / 5, OFFSET * 2/3 + i * BOXSIZE + BOXSIZE / 2, textClr);
+            }
     }
     
     /**
@@ -104,6 +130,18 @@ public class AquariumViewer implements MouseListener
     public void displayAquariums()
     {
         // TODO 11
+        sc.drawLine(OFFSET, OFFSET, OFFSET + size * BOXSIZE, OFFSET, aqumLine);
+        sc.drawLine(OFFSET, OFFSET, OFFSET, OFFSET + size * BOXSIZE, aqumLine);
+        sc.drawLine(OFFSET, OFFSET + size * BOXSIZE, OFFSET + size * BOXSIZE, OFFSET + size * BOXSIZE, aqumLine);
+        sc.drawLine(OFFSET + size * BOXSIZE, OFFSET, OFFSET + size * BOXSIZE, OFFSET + size * BOXSIZE, aqumLine);
+        
+        for (int i = 0; i < size -1; i++)
+            for (int j = 0; j < size; j++)
+            {   // Choose the colour for this tile
+                if (puzzle.getAquariums()[i][j] != puzzle.getAquariums()[i+1][j]) // draw bottom horizontal wall
+                    sc.drawLine(OFFSET + i*BOXSIZE, OFFSET + j*BOXSIZE + BOXSIZE,
+                                OFFSET + i*BOXSIZE + BOXSIZE, OFFSET + j * BOXSIZE + BOXSIZE, aqumLine);
+            }
     }
     
     /**
