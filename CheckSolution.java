@@ -9,6 +9,8 @@
  * @version 2020
  */
 
+import java.util.Arrays;
+
 public class CheckSolution
 {
     /**
@@ -138,22 +140,16 @@ public class CheckSolution
      */
     public static String isSolution(Aquarium p)
     {
-        int size = p.getSize();
-
-        int expectedRows[] = p.getRowTotals();
-        int expectedColumns[] = p.getColumnTotals();
-        int actualRows[] = rowCounts(p);
-        int actualColumns[] = columnCounts(p);
-
-        for (int i = 0; i < size; i++) {
-            if (actualRows[i] != expectedRows[i]) {
-                return "Row " + i + " is wrong";
-            }
-            if (actualColumns[i] != expectedRows[i]) {
-                return "Column " + i + " is wrong";
-            }
+        int mismatchIdx = Arrays.mismatch(rowCounts(p), p.getRowTotals());
+        if (mismatchIdx != -1) {
+            return "Row " + mismatchIdx + " is wrong";
+        }
+        mismatchIdx = Arrays.mismatch(columnCounts(p), p.getColumnTotals());
+        if (mismatchIdx != -1) {
+            return "Column " + mismatchIdx + " is wrong";
         }
 
+        int size = p.getSize();
         int aquariums[][] = p.getAquariums();
         for (int a = 0; a < aquariums[size - 1][size - 1]; a++) {
             String aquariumSpace = isAquariumOK(p, a);
