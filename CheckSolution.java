@@ -8,7 +8,6 @@
  * @author Aria Warddhana (22984998)
  * @version 2020
  */
-import java.util.Arrays; 
 
 public class CheckSolution
 {
@@ -22,8 +21,19 @@ public class CheckSolution
      */
     public static int[] rowCounts(Aquarium p)
     {
-        // TODO 16
-        return null;
+        int size = p.getSize();
+        int[] counts = new int[size];
+        Space[][] spaces = p.getSpaces();
+
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (spaces[r][c] == Space.WATER) {
+                    counts[r] += 1;
+                }
+            }
+        }
+
+        return counts;
     }
     
     /**
@@ -31,8 +41,19 @@ public class CheckSolution
      */
     public static int[] columnCounts(Aquarium p)
     {
-        // TODO 17
-        return null;
+        int size = p.getSize();
+        int[] counts = new int[size];
+        Space[][] spaces = p.getSpaces();
+
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (spaces[r][c] == Space.WATER) {
+                    counts[c] += 1;
+                }
+            }
+        }
+
+        return counts;
     }
     
     /**
@@ -47,8 +68,37 @@ public class CheckSolution
      */
     public static int[] rowStatus(Aquarium p, int t, int r)
     {
-        // TODO 18
-        return null;
+        int size = p.getSize();
+        Space[] spaces = p.getSpaces()[r];
+        int[] aquariums = p.getAquariums()[r];
+        int firstSpaceIdx = -1;
+        boolean foundWater = false;
+        boolean foundOther = false;
+        for (int c = 0; c < size; c++) {
+            if (aquariums[c] == t) {
+                if (firstSpaceIdx == -1) {
+                    firstSpaceIdx = c;
+                }
+
+                if (spaces[c] == Space.WATER) {
+                    foundWater = true;
+                } else {
+                    foundOther = true;
+                }
+            }
+        }
+
+        int status = 0;
+        if (firstSpaceIdx != -1) {
+            if (foundWater) {
+                status += 1;
+            }
+            if (foundOther) {
+                status += 2;
+            }
+        }
+
+        return new int[]{status, firstSpaceIdx};
     }
     
     /**
@@ -60,8 +110,23 @@ public class CheckSolution
      */
     public static String isAquariumOK(Aquarium p, int t)
     {
-        // TODO 19
-        return null;
+        boolean underwater = false;
+        for (int r = 0; r < p.getSize(); r++) {
+            int[] result = rowStatus(p, t, r);
+            int status = result[0];
+            int column = result[1];
+            if (status != 0) {
+                if (status == 1 && !underwater) {
+                    underwater = true;
+                } else if (status == 2 && underwater) {
+                    return r + "," + column;
+                } else if (status == 3) {
+                    return r + "," + column;
+                }
+            }
+        }
+
+        return "";
     }
     
     /**
@@ -73,7 +138,30 @@ public class CheckSolution
      */
     public static String isSolution(Aquarium p)
     {
-        // TODO 20
-        return null;
+        int size = p.getSize();
+
+        int expectedRows[] = p.getRowTotals();
+        int expectedColumns[] = p.getColumnTotals();
+        int actualRows[] = rowCounts(p);
+        int actualColumns[] = columnCounts(p);
+
+        for (int i = 0; i < size; i++) {
+            if (actualRows[i] != expectedRows[i]) {
+                return "Row " + i + " is wrong";
+            }
+            if (actualColumns[i] != expectedRows[i]) {
+                return "Column " + i + " is wrong";
+            }
+        }
+
+        int aquariums[][] = p.getAquariums();
+        for (int a = 0; a < aquariums[size - 1][size - 1]; a++) {
+            String aquariumSpace = isAquariumOK(p, a);
+            if (!aquariumSpace.equals("")) {
+                return "The aquarium at " + aquariumSpace + " is wrong";
+            }
+        }
+
+        return "\u2713\u2713\u2713";
     }
 }
