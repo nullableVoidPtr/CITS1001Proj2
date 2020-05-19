@@ -35,8 +35,9 @@ public class Aquarium
         size = columnTotals.length;
 
         aquariums = new int[size][];
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             aquariums[i] = parseLine(lines.get(i + 3));
+        }
 
         spaces = new Space[size][size];
         clear();
@@ -59,8 +60,9 @@ public class Aquarium
     {
         String tokens[] = s.split(" ");
         int result[] = new int[tokens.length];
-        for (int i = 0; i < tokens.length; i++)
+        for (int i = 0; i < tokens.length; i++) {
             result[i] = Integer.parseInt(tokens[i]);
+        }
 
         return result;
     }
@@ -110,8 +112,7 @@ public class Aquarium
      * the target, it becomes empty; otherwise, it becomes the target.
      */
     public void toggleSpace(int r, int c, Space targetState) {
-        if (r < 0 || r >= size) return;
-        if (c < 0 || c >= size) return;
+        if (r < 0 || r >= size || c < 0 || c >= size) return;
 
         spaces[r][c] = (spaces[r][c] == targetState) ? Space.EMPTY : targetState;
     }
