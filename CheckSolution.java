@@ -112,8 +112,9 @@ public class CheckSolution
      */
     public static String isAquariumOK(Aquarium p, int t)
     {
+        int size = p.getSize();
         boolean underwater = false;
-        for (int r = 0; r < p.getSize(); r++) {
+        for (int r = 0; r < size; r++) {
             int[] result = rowStatus(p, t, r);
             int status = result[0];
             int column = result[1];
@@ -153,7 +154,7 @@ public class CheckSolution
         int aquariums[][] = p.getAquariums();
         for (int a = 0; a < aquariums[size - 1][size - 1]; a++) {
             String aquariumSpace = isAquariumOK(p, a);
-            if (!aquariumSpace.equals("")) {
+            if (!aquariumSpace.isEmpty()) {
                 return "The aquarium at " + aquariumSpace + " is wrong";
             }
         }
