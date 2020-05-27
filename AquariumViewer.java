@@ -15,28 +15,35 @@ public class AquariumViewer implements MouseListener
     private final int BOXSIZE = 40;          // the size of each square
     private final int OFFSET  = BOXSIZE * 2; // the gap around the board
     private       int WINDOWSIZE;            // set this in the constructor 
+    private       int BUTTONTOP;
+    private       int BUTTONBOTTOM;
+    private       int SOLVEBUTTONLEFT;
+    private       int SOLVEBUTTONRIGHT;
+    private       int CLEARBUTTONLEFT;
+    private       int CLEARBUTTONRIGHT;
     
     private Aquarium puzzle;                 // the internal representation of the puzzle
     private int        size;                 // the puzzle is size x size
     private SimpleCanvas sc;                 // the display window
     
-    private final Color waterClr    = Color.blue;
-    private final Color airClr      = Color.green;
+    private final Color waterClr    = Color.cyan;
+    private final Color airClr      = Color.pink;
     private final Color gridLine    = Color.black;
     private final Color aqumLine    = Color.red;
     private final Color btnClr      = Color.cyan;
     private final Color textClr     = Color.black;
     private final Color bgColor     = Color.white;
+
+    private final int aqumLineWidth = 2;
     /**
      * Main constructor for objects of class AquariumViewer.
      * Sets all fields, and displays the initial puzzle.
      */
     public AquariumViewer(Aquarium puzzle)
     {
-        // TODO 8
         this.puzzle = puzzle;
         size = puzzle.getSize();
-        this.WINDOWSIZE = size * BOXSIZE + 2 * OFFSET;
+        WINDOWSIZE = size * BOXSIZE + 2 * OFFSET;
         sc = new SimpleCanvas(size + " x " + size + " Aquarium Puzzle", WINDOWSIZE, WINDOWSIZE, bgColor);
         sc.addMouseListener(this);
         sc.setFont(new Font("Times", 20, BOXSIZE / 2));
@@ -65,7 +72,6 @@ public class AquariumViewer implements MouseListener
      */
     public Aquarium getPuzzle()
     {
-        // TODO 7a
         return puzzle;
     }
     
@@ -74,7 +80,6 @@ public class AquariumViewer implements MouseListener
      */
     public int getSize()
     {
-        // TODO 7b
         return size;
     }
 
@@ -83,7 +88,6 @@ public class AquariumViewer implements MouseListener
      */
     public SimpleCanvas getCanvas()
     {
-        // TODO 7c
         return sc;
     }
     
@@ -92,10 +96,9 @@ public class AquariumViewer implements MouseListener
      */
     private void displayPuzzle()
     {
-        // TODO 13
         displayGrid();
-        displayAquariums();
         displayNumbers();
+        displayAquariums();
         displayButtons();
     }
     
@@ -104,12 +107,10 @@ public class AquariumViewer implements MouseListener
      */
     public void displayGrid()
     {
-        // TODO 9
-        for (int i = 0 ; i <= size; i++)
-            {
+        for (int i = 0; i <= size; i++) {
             sc.drawLine(OFFSET, OFFSET + i * BOXSIZE, OFFSET + size * BOXSIZE, OFFSET + i * BOXSIZE, gridLine);
             sc.drawLine(OFFSET + i * BOXSIZE, OFFSET, OFFSET + i * BOXSIZE, OFFSET + size * BOXSIZE, gridLine);
-            }
+        }
     }
     
     /**
@@ -117,16 +118,26 @@ public class AquariumViewer implements MouseListener
      */
     public void displayNumbers()
     {
-        // TODO 10
-        for (int i = 1 ; i <= size; i++)
-            {
-            sc.drawString(puzzle.getColumnTotals()[i-1],
-                          OFFSET / 2 + i * BOXSIZE + BOXSIZE / 2,
+        for (int i = 0; i < size; i++) {
+            sc.drawString(puzzle.getColumnTotals()[i],
+                          OFFSET / 2 + (i + 1) * BOXSIZE + BOXSIZE / 2,
                           OFFSET * 3/4, textClr);
-            sc.drawString(puzzle.getRowTotals()[i-1],
+            sc.drawString(puzzle.getRowTotals()[i],
                           OFFSET * 3 / 5,
-                          OFFSET * 2/3 + i * BOXSIZE + BOXSIZE / 2, textClr);
-            }
+                          OFFSET * 2/3 + (i + 1) * BOXSIZE + BOXSIZE / 2, textClr);
+        }
+    }
+
+    /**
+     * Display a 'line' of aqumLine Color and aqumLineWidth
+     */
+    public void displayBoundary(int x1, int y1, int x2, int y2)
+    {
+        sc.drawRectangle(x1 - aqumLineWidth,
+                         y1 - aqumLineWidth,
+                         x2 + aqumLineWidth,
+                         y2 + aqumLineWidth,
+                         aqumLine);
     }
     
     /**
@@ -134,80 +145,64 @@ public class AquariumViewer implements MouseListener
      */
     public void displayAquariums()
     {
-        // TODO 11
-        for (int k = -1; k<=1; k++)     // 3 iterations to draw wider lines
-            {
-            sc.drawLine(OFFSET,                         // draw top border
-                        OFFSET + k,
-                        OFFSET + size * BOXSIZE,
-                        OFFSET + k,
-                        aqumLine); 
-            sc.drawLine(OFFSET + k,                     // draw LHS border
-                        OFFSET,
-                        OFFSET + k,
-                        OFFSET + size * BOXSIZE,
-                        aqumLine);
-            sc.drawLine(OFFSET,                         // draw btm border
-                        OFFSET + size * BOXSIZE + k,
-                        OFFSET + size * BOXSIZE,
-                        OFFSET + size * BOXSIZE + k,
-                        aqumLine);
-            sc.drawLine(OFFSET + size * BOXSIZE + k,    // draw RHS border
-                        OFFSET,
-                        OFFSET + size * BOXSIZE + k,
-                        OFFSET + size * BOXSIZE,
-                        aqumLine);
-            
-             for (int i = 0; i < size - 1; i++)
-                for (int j = 0; j < size; j++)          // draw bot box wall
-                {   
-                    if (puzzle.getAquariums()[i][j] !=
-                        puzzle.getAquariums()[i+1][j]) 
-                        sc.drawLine(OFFSET + j*BOXSIZE,
-                                    OFFSET + i*BOXSIZE + BOXSIZE + k,
-                                    OFFSET + j*BOXSIZE + BOXSIZE,
-                                    OFFSET + i*BOXSIZE + BOXSIZE + k,
-                                    aqumLine);
+        int gridSize = size * BOXSIZE;
+        displayBoundary(OFFSET, OFFSET, OFFSET + gridSize, OFFSET);
+        displayBoundary(OFFSET, OFFSET, OFFSET, OFFSET + gridSize);
+
+        int aquariums[][] = puzzle.getAquariums();
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                int bottomRightX = OFFSET + ((c + 1) * BOXSIZE);
+                int bottomRightY = OFFSET + ((r + 1) * BOXSIZE);
+
+                if (c == size - 1 || aquariums[r][c] != aquariums[r][c + 1]) {
+                    displayBoundary(bottomRightX,
+                                    bottomRightY - BOXSIZE,
+                                    bottomRightX,
+                                    bottomRightY);
                 }
-            for (int i = 0; i < size; i++)
-                for (int j = 0; j < size -1; j++)       // draw RHS box wall
-                {   
-                    if (puzzle.getAquariums()[i][j] !=
-                        puzzle.getAquariums()[i][j+1])
-                        sc.drawLine(OFFSET + j*BOXSIZE + BOXSIZE + k,
-                                    OFFSET + i*BOXSIZE,
-                                    OFFSET + j*BOXSIZE + BOXSIZE + k,
-                                    OFFSET + i*BOXSIZE + BOXSIZE,
-                                    aqumLine);
-                } 
+                if (r == size - 1 || aquariums[r + 1][c] != aquariums[r][c]) {
+                    displayBoundary(bottomRightX - BOXSIZE,
+                                    bottomRightY,
+                                    bottomRightX,
+                                    bottomRightY);
+                }
             }
+        }
     }
+
     
     /**
      * Displays the buttons below the grid.
      */
     public void displayButtons()
     {
-        // TODO 12
         int textOffset = BOXSIZE / 8;
-        sc.drawRectangle(WINDOWSIZE * 1/5,  // solve button
-                         WINDOWSIZE - OFFSET * 2/3,
-                         WINDOWSIZE * 2/5,
-                         WINDOWSIZE - OFFSET * 1/3,
+        BUTTONTOP = WINDOWSIZE - OFFSET * 2 / 3;
+        BUTTONBOTTOM = WINDOWSIZE - OFFSET / 3;
+        SOLVEBUTTONLEFT = WINDOWSIZE / 5;
+        SOLVEBUTTONRIGHT = WINDOWSIZE * 2 / 5;
+        CLEARBUTTONLEFT = WINDOWSIZE * 3 / 5;
+        CLEARBUTTONRIGHT = WINDOWSIZE * 4 / 5;
+
+        sc.drawRectangle(SOLVEBUTTONLEFT,  // solve button
+                         BUTTONTOP,
+                         SOLVEBUTTONRIGHT,
+                         BUTTONBOTTOM,
                          btnClr);
-        sc.drawRectangle(WINDOWSIZE * 3/5,  // clear button
-                         WINDOWSIZE - OFFSET * 2/3,
-                         WINDOWSIZE * 4/5,
-                         WINDOWSIZE - OFFSET * 1/3,
+        sc.drawRectangle(CLEARBUTTONLEFT,  // clear button
+                         BUTTONTOP,
+                         CLEARBUTTONRIGHT,
+                         BUTTONBOTTOM,
                          btnClr);
-        sc.drawString   ("Solve?",             // solve button text
-                         WINDOWSIZE * 1/5 + textOffset,  
-                         WINDOWSIZE - OFFSET * 1/3 - textOffset,
-                         textClr);
-        sc.drawString   ("Clear?",             // clear button text
-                         WINDOWSIZE * 3/5 + textOffset,  
-                         WINDOWSIZE - OFFSET * 1/3 - textOffset,
-                         textClr);
+        sc.drawString("Solve?",
+                      SOLVEBUTTONLEFT + textOffset,
+                      BUTTONBOTTOM - textOffset,
+                      textClr);
+        sc.drawString("Clear?",
+                      CLEARBUTTONLEFT + textOffset,
+                      BUTTONBOTTOM - textOffset,
+                      textClr);
     }
     
     /**
@@ -216,27 +211,26 @@ public class AquariumViewer implements MouseListener
      */
     public void updateSquare(int r, int c)
     {
-        // TODO 14
-        if (puzzle.getSpaces()[r][c] == Space.EMPTY)
-            sc.drawRectangle (OFFSET + c*BOXSIZE,
-                              OFFSET + r*BOXSIZE,
-                              OFFSET + c*BOXSIZE + BOXSIZE,
-                              OFFSET + r*BOXSIZE + BOXSIZE, bgColor);
-        if (puzzle.getSpaces()[r][c] == Space.AIR)
-        {
-            sc.drawRectangle (OFFSET + c*BOXSIZE,
-                              OFFSET + r*BOXSIZE,
-                              OFFSET + c*BOXSIZE + BOXSIZE,
-                              OFFSET + r*BOXSIZE + BOXSIZE, bgColor);
-            sc.drawCircle(    OFFSET + c*BOXSIZE + BOXSIZE / 2,
-                              OFFSET + r*BOXSIZE + BOXSIZE / 2,
-                              BOXSIZE / 3, airClr);
-        }                 
-        if (puzzle.getSpaces()[r][c] == Space.WATER)
-            sc.drawRectangle (OFFSET + c*BOXSIZE,
-                              OFFSET + r*BOXSIZE,
-                              OFFSET + c*BOXSIZE + BOXSIZE,
-                              OFFSET + r*BOXSIZE + BOXSIZE, waterClr);
+        if (r < 0 || r >= size || c < 0 || c >= size) return;
+
+        sc.drawRectangle(OFFSET + c * BOXSIZE,
+                         OFFSET + r * BOXSIZE,
+                         OFFSET + (c + 1) * BOXSIZE,
+                         OFFSET + (r + 1) * BOXSIZE, bgColor);
+
+        Space square = puzzle.getSpaces()[r][c];
+        if (square == Space.AIR) {
+            sc.drawCircle(OFFSET + c * BOXSIZE + BOXSIZE / 2,
+                          OFFSET + r * BOXSIZE + BOXSIZE / 2,
+                          BOXSIZE / 4,
+                          airClr);
+        } else if (square == Space.WATER) {
+            sc.drawRectangle (OFFSET + c * BOXSIZE,
+                              OFFSET + r * BOXSIZE,
+                              OFFSET + (c + 1) * BOXSIZE,
+                              OFFSET + (r + 1) * BOXSIZE,
+                              waterClr);
+        }
         displayGrid();
         displayAquariums();
     }
@@ -249,88 +243,52 @@ public class AquariumViewer implements MouseListener
      */
     public void mousePressed(MouseEvent e) 
     {
-        // TODO 15
-        boolean onBoard = false;
-        boolean onSolve = false;
-        boolean onClear = false;
+        int clickX = e.getX();
+        int clickY = e.getY();
         
-        if (e.getX() > OFFSET)
-            if(e.getX() < WINDOWSIZE - OFFSET)
-                if (e.getY() > OFFSET)
-                    if (e.getY() < WINDOWSIZE - OFFSET)
-                onBoard = true;
-        if (onBoard != true)
-            if (e.getX() > WINDOWSIZE * 1/5 &&
-                e.getX() < WINDOWSIZE * 2/5)
-                if (e.getY() > WINDOWSIZE - OFFSET * 2/3 &&
-                    e.getY() < WINDOWSIZE - OFFSET * 1/3)
-                    onSolve = true;
-        if (onBoard != true)    
-            if (e.getX() > WINDOWSIZE * 3/5 &&
-                e.getX() < WINDOWSIZE * 4/5)
-                if (e.getY() > WINDOWSIZE - OFFSET * 2/3 &&
-                    e.getY() < WINDOWSIZE - OFFSET * 1/3)
-                    onClear = true;
-        if (SwingUtilities.isLeftMouseButton(e))
-           if (onBoard)
-           {
-            int selTileX = 0;
-            for (int i = 0; i < size; i++)
-                if (e.getX() > OFFSET + i * BOXSIZE &&
-                    e.getX() < OFFSET + i * BOXSIZE + BOXSIZE)
-                selTileX = i;
-        
-                int selTileY = 0;
-                for (int j = 0; j < size; j++)
-            if (e.getY() > OFFSET + j * BOXSIZE &&
-                e.getY() < OFFSET + j * BOXSIZE + BOXSIZE)
-                selTileY = j;
-                       puzzle.leftClick(selTileY, selTileX);
-                       updateSquare(selTileY,selTileX);
-           }               
-           if (onSolve)
-           {
-              sc.drawRectangle (0,0,
-                                WINDOWSIZE,
-                                OFFSET - 1,
-                                bgColor);
-                  sc.drawString(CheckSolution.isSolution(puzzle),
-                                WINDOWSIZE * 1/4,  
-                                OFFSET * 1/3,
-                                textClr);
-              displayNumbers();
-           }           
-           if (onClear)
-           {
-              this.puzzle.clear();
-              for (int i = 0; i < size ; i++)
-                    for (int j = 0; j < size; j++)
-                    this.updateSquare(i, j);
-              sc.drawRectangle (0,0,
-                                WINDOWSIZE,
-                                OFFSET - 1,
-                                bgColor);
-              displayNumbers();
-           }  
-        if (SwingUtilities.isRightMouseButton(e))
-        {
-           if (onBoard)
-           {
-            int selTileX = 0;
-            for (int i = 0; i < size; i++)
-                if (e.getX() > OFFSET + i * BOXSIZE &&
-                    e.getX() < OFFSET + i * BOXSIZE + BOXSIZE)
-                selTileX = i;
-        
-                int selTileY = 0;
-                for (int j = 0; j < size; j++)
-            if (e.getY() > OFFSET + j * BOXSIZE &&
-                e.getY() < OFFSET + j * BOXSIZE + BOXSIZE)
-                selTileY = j;
-                       puzzle.rightClick(selTileY, selTileX);
-                       updateSquare(selTileY,selTileX);
-           }           
-                       
+        if (clickX > OFFSET &&
+            clickX < WINDOWSIZE - OFFSET &&
+            clickY > OFFSET &&
+            clickY < WINDOWSIZE - OFFSET) {
+            int selTileX = (clickX - OFFSET) / BOXSIZE;
+            int selTileY = (clickY - OFFSET) / BOXSIZE;
+
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                puzzle.leftClick(selTileY, selTileX);
+            } else if (SwingUtilities.isRightMouseButton(e)) {
+                puzzle.rightClick(selTileY, selTileX);
+            }
+
+            updateSquare(selTileY,selTileX);
+        }
+
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            if (clickY > BUTTONTOP &&
+                clickY < BUTTONBOTTOM) {
+                if (clickX > SOLVEBUTTONLEFT &&
+                    clickX < SOLVEBUTTONRIGHT) {
+                    sc.drawRectangle(0,0,
+                                     WINDOWSIZE,
+                                     OFFSET - 1,
+                                     bgColor);
+                    sc.drawString(CheckSolution.isSolution(puzzle),
+                                  WINDOWSIZE / 4,
+                                  BOXSIZE,
+                                  textClr);
+                    displayNumbers();
+                } else if (clickX > CLEARBUTTONLEFT &&
+                    clickX < CLEARBUTTONRIGHT) {
+                    this.puzzle.clear();
+                    for (int r = 0; r < size ; r++)
+                        for (int c = 0; c < size; c++)
+                            this.updateSquare(r, c);
+                    sc.drawRectangle(0,0,
+                                     WINDOWSIZE,
+                                     OFFSET - 1,
+                                     bgColor);
+                    displayNumbers();
+                }
+            }
         }
     }
     public void mouseClicked(MouseEvent e) {}
