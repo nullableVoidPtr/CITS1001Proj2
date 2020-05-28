@@ -265,29 +265,26 @@ public class AquariumViewer implements MouseListener
         if (SwingUtilities.isLeftMouseButton(e)) {
             if (clickY > BUTTONTOP &&
                 clickY < BUTTONBOTTOM) {
+                sc.drawRectangle(0,0,
+                                 WINDOWSIZE,
+                                 OFFSET - aqumLineWidth,
+                                 bgColor);
                 if (clickX > SOLVEBUTTONLEFT &&
                     clickX < SOLVEBUTTONRIGHT) {
-                    sc.drawRectangle(0,0,
-                                     WINDOWSIZE,
-                                     OFFSET - 1,
-                                     bgColor);
                     sc.drawString(CheckSolution.isSolution(puzzle),
                                   WINDOWSIZE / 4,
                                   BOXSIZE,
                                   textClr);
-                    displayNumbers();
                 } else if (clickX > CLEARBUTTONLEFT &&
                     clickX < CLEARBUTTONRIGHT) {
                     this.puzzle.clear();
-                    for (int r = 0; r < size ; r++)
-                        for (int c = 0; c < size; c++)
+                    for (int r = 0; r < size ; r++) {
+                        for (int c = 0; c < size; c++){
                             this.updateSquare(r, c);
-                    sc.drawRectangle(0,0,
-                                     WINDOWSIZE,
-                                     OFFSET - 1,
-                                     bgColor);
-                    displayNumbers();
+                        }
+                    }
                 }
+                displayNumbers();
             }
         }
     }
