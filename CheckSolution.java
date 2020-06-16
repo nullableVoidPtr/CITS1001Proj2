@@ -68,6 +68,7 @@ public class CheckSolution
      * 2 if they're all not-water; or 
      * 3 if they're a mixture of water and not-water. 
      */
+	// CLARITY: return error/status when found
     public static int[] rowStatus(Aquarium p, int t, int r)
     {
         int size = p.getSize();
@@ -137,6 +138,7 @@ public class CheckSolution
      * Returns three ticks if the solution is correct; 
      * otherwise see the LMS page for the expected results. 
      */
+	// CORRECTNESS: 2/3, doesn't pass one of 3 tests
     public static String isSolution(Aquarium p)
     {
         int mismatchIdx = Arrays.mismatch(rowCounts(p), p.getRowTotals());
